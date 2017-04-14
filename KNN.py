@@ -1,10 +1,19 @@
 import numpy as np
 import pdb
+from os.path import isfile
 from pprint import pprint
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn import metrics
 import matplotlib.pyplot as plt
+import wget
+
+def getWineData():
+    if not isfile('winequality-white.csv'):
+        url = "http://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-white.csv"
+        wget.download(url)
+    data = np.genfromtxt('winequality-white.csv',delimiter=';',skip_header=1)
+    return data
 
 def plot_confusion_matrix(cm, title="Confusion matrix", cmap=plt.cm.Blues):
     plt.imshow(cm,interpolation="nearest", cmap=cmap)
@@ -19,9 +28,8 @@ def plot_confusion_matrix(cm, title="Confusion matrix", cmap=plt.cm.Blues):
     plt.show()
 
 
-def KNN(K,distance=None,training_data=None,test_data=None):
+def KNN(K,distance,data,training_data=None,test_data=None):
     print("K = %d, distance = %s" % (K,distance))
-    data = np.genfromtxt('winequality-white.csv',delimiter=';',skip_header=1)
     X,Y = data[:,:11],data[:,11:].ravel()
     nei = KNeighborsClassifier(K,algorithm='brute',metric=distance)
     nei.fit(X,Y)
@@ -32,9 +40,10 @@ def KNN(K,distance=None,training_data=None,test_data=None):
 
 
 def main():
+    data = getWineData()
     for distance in ['manhattan','cosine','euclidean']:
         for i in range(1):
-            KNN(i+1,distance)
+            KNN(i+1,distance,data)
 
 if __name__ == "__main__":
     main()
